@@ -15,6 +15,7 @@ export class Animation {
 
         this.currentFrame = 0;
         this.currentSeconds = 0;
+        this.fps = fps;
         this.maxSeconds = 1 / fps;
         this.maxFrame = spriteSheet.width / frameWidth;
     }
@@ -79,4 +80,9 @@ function loadAnimation(data) {
     return new Animation(img, data.frameW, data.frameH, data.fps, data.y);
 }
 
-export { loadAll, sprites, animations }
+function getAnimation(animationName) {
+    let a = animations[animationName];
+    return new Animation(a.spriteSheet, a.frameWidth, a.frameHeight, a.fps, a.frameY);
+}
+
+export { loadAll, sprites, getAnimation }

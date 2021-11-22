@@ -57,6 +57,7 @@ function draw(dt) {
 
 // Take care of initializing canvas and grabbing the context
 window.onload = init;
+
 function init() {
     canvas = document.querySelector("#mycanvas");
     ctx = canvas.getContext("2d");
@@ -70,8 +71,8 @@ function init() {
 
     // init all the entities in the game:
     entities = [
-        new Unit(assets.animations["friendlyWalk"], new Rect(0, 0, 75, 150)),
-        new Unit(assets.animations["characterWalk"], new Rect(0, 0, 75, 150)),
+        new Unit(assets.getAnimation("friendlyWalk"), new Rect(0, 0, 75, 150)),
+        new Unit(assets.getAnimation("friendlyWalk"), new Rect(worldWidth - 75, 0, 75, 150)),
     ];
 
     gameLoop();
@@ -80,6 +81,7 @@ function init() {
 // Gameloop will probably never need to be touched.
 // It should always do just these things
 let prevFrameTimeStamp;
+
 function gameLoop(timestamp) {
     // Dt is time passed since last frame in seconds
     let dt = 0;
