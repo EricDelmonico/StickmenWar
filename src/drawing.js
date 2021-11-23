@@ -1,18 +1,8 @@
 // Author: Eric Delmonico
 //
 // drawing.js handles the basic drawing needs of the game.
-// It has a definition for a Rect class for drawing, and
-// will have methods to draw rects, sprites, and sprites
+// It has methods to draw rects, sprites, and sprites
 // from spritesheets.
-
-export class Rect {
-    constructor(x, y, width, height) {
-        this.x = x;
-        this.y = y;
-        this.width = width;
-        this.height = height;
-    }
-}
 
 function drawRect(ctx, rect, color) {
     ctx.save();

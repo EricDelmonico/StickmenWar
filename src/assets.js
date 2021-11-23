@@ -2,48 +2,7 @@
 //
 // assets.js loads all the image assets and animations for the game
 
-import * as drawing from "./drawing.js";
-import { Rect } from "./drawing.js";
-
-// Holds an animation
-export class Animation {
-    constructor(spriteSheet, frameWidth, frameHeight, fps, frameY = 0) {
-        this.spriteSheet = spriteSheet;
-        this.frameWidth = frameWidth;
-        this.frameHeight = frameHeight;
-        this.frameY = frameY;
-
-        this.currentFrame = 0;
-        this.currentSeconds = 0;
-        this.fps = fps;
-        this.maxSeconds = 1 / fps;
-        this.maxFrame = spriteSheet.width / frameWidth;
-    }
-
-    update(dt) {
-        this.currentSeconds += dt;
-
-        // Move animation a frame if needed
-        if (this.currentSeconds > this.maxSeconds) {
-            this.currentFrame++;
-            // Restart animation if it finished
-            if (this.currentFrame >= this.maxFrame) {
-                this.currentFrame = 0;
-            }
-
-            // Reset currentSeconds
-            this.currentSeconds = 0;
-        }
-    }
-
-    draw(ctx, dt, destRect) {
-        drawing.drawSprite(
-            ctx,
-            this.spriteSheet,
-            destRect,
-            new Rect(this.currentFrame * this.frameWidth, this.frameY, this.frameWidth, this.frameHeight));
-    }
-}
+import { Animation } from "./animation.js";
 
 // Array of all Image objects created from files in spriteNames
 const sprites = {};
@@ -70,24 +29,41 @@ function loadAll() {
         sprites[name] = loadImage(name);
     }
     for (let data of animationDatas) {
-        animations[data.name] = loadAnimation(data);
+        loadAnimation(data);
     }
 }
 
+let imagesLoading = animationDatas.length + spriteNames.length;
 function loadImage(imageFileName) {
     let img = new Image();
     img.src = `../assets/${imageFileName}.png`;
+    img.onload = imageOnLoad;
     return img;
 }
 
 function loadAnimation(data) {
     let img = loadImage(data.file);
-    return new Animation(img, data.frameW, data.frameH, data.fps, data.y);
+    img.onload = () => animationOnLoad(data, img);
 }
 
 function getAnimation(animationName) {
     let a = animations[animationName];
     return new Animation(a.spriteSheet, a.frameWidth, a.frameHeight, a.fps, a.frameY);
+}
+
+// Decrement imagesLoading and fire assetsLoaded event if all the images loaded
+function imageOnLoad() {
+    imagesLoading--;
+    if (imagesLoading <= 0) {
+        let assetsLoaded = new Event("assetsLoaded");
+        document.dispatchEvent(assetsLoaded);
+    }
+}
+
+// Create a new animation, then call imageOnLoad
+function animationOnLoad(data, img) {
+    animations[data.name] = new Animation(img, data.frameW, data.frameH, data.fps, data.y);
+    imageOnLoad();
 }
 
 export { loadAll, sprites, getAnimation }
