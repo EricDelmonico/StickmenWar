@@ -9,11 +9,14 @@ export class Rect {
         this.y = y;
         this.width = width;
         this.height = height;
+        this.collision = true;
     }
 
     // Whether this rect collides with the other.
     // NOTE: this is 1-dimensional!!
     collidesWith(other) {
+        if (!this.collision) return false;
+
         let right = this.x + this.width;
         let left = this.x;
 
@@ -28,6 +31,8 @@ export class Rect {
 
     // Whether this rect contains a point
     containsPoint(x, y) {
+        if (!this.collision) return false;
+
         let top = this.y;
         let bottom = this.y + this.height;
         let left = this.x;

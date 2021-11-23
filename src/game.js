@@ -13,7 +13,7 @@ import * as input from "./input.js";
 
 let ctx;
 let canvas;
-let clearColor = "#EEE";
+let clearColor = "#FFF";
 
 // Current scene
 let gameScene;

@@ -10,13 +10,14 @@ import { Rect } from "./rect.js";
 
 export const UnitStates = {
     Walking: 0,
-    Stopped: 1
+    Stopped: 1,
+    Dead: 2
 };
 
 export class Unit {
-    constructor(walkAnimation, idleAnimation, attackAnimation, rect, dir, entityList, damage = 1, hp = 10) {
+    constructor(walkAnimation, deathAnimation, attackAnimation, rect, dir, entityList, damage = 1, hp = 10) {
         this.walkAnim = walkAnimation;
-        this.idleAnim = idleAnimation;
+        this.deathAnim = deathAnimation;
         this.attackAnim = attackAnimation;
         this.animation = walkAnimation;
         this.rect = rect;
@@ -37,7 +38,7 @@ export class Unit {
         // Update health bar position to be centered on the unit
         let hpx = (this.rect.x + this.rect.width / 2) - (this.maxHPRect.width / 2);
         this.maxHPRect.x = hpx;
-        this.hpRect.x = hpx; 
+        this.hpRect.x = hpx;
 
         // Update hp bar width
         this.hpRect.width = this.hp / this.maxHP * this.maxHPRect.width;
@@ -49,6 +50,12 @@ export class Unit {
                 break;
             case UnitStates.Stopped:
                 this.animation = this.attackAnim;
+                break;
+            case UnitStates.Dead:
+                this.animation = this.deathAnim;
+                if (this.animation.animationFinished) {
+                    this.deathAnimationOver();
+                }
                 break;
         }
     }
@@ -64,8 +71,13 @@ export class Unit {
     doDamage(damage) {
         this.hp -= damage;
         if (this.hp <= 0) {
-            let index = this.entityList.indexOf(this);
-            this.entityList.splice(index, 1);
+            this.state = UnitStates.Dead;
+            this.rect.collision = false;
         }
+    }
+
+    deathAnimationOver() {
+        let index = this.entityList.indexOf(this);
+        this.entityList.splice(index, 1);
     }
 }

@@ -14,14 +14,14 @@ let spriteNames = [
 
 ];
 
-// Animations! Format is anim name, file name, frame width, frame height, fps, frame y
+// Animations! Format is anim name, file name, frame width, frame height, fps, frame y, looping
 let animationDatas = [
-    { name: "friendlyWalk", file: "friendlyWalk", frameW: 100, frameH: 200, fps: 10, y: 200 },
-    { name: "friendlyAttack", file: "friendlyAttackDie", frameW: 100, frameH: 200, fps: 10, y: 0 },
-    { name: "friendlyDie", file: "friendlyAttackDie", frameW: 100, frameH: 200, fps: 10, y: 200 },
-    { name: "enemyWalk", file: "enemyWalk", frameW: 100, frameH: 200, fps: 10, y: 400 },
-    { name: "enemyAttack", file: "enemyAttackDie", frameW: 100, frameH: 200, fps: 10, y: 0 },
-    { name: "enemyDie", file: "enemyAttackDie", frameW: 100, frameH: 200, fps: 10, y: 200 }
+    { name: "friendlyWalk", file: "friendlyWalk", frameW: 100, frameH: 200, fps: 10, y: 200, looping: true, playbackDirection: 1 },
+    { name: "friendlyAttack", file: "friendlyAttackDie", frameW: 100, frameH: 200, fps: 10, y: 0, looping: true, playbackDirection: 1 },
+    { name: "friendlyDeath", file: "friendlyAttackDie", frameW: 100, frameH: 200, fps: 10, y: 200, looping: false, playbackDirection: 1 },
+    { name: "enemyWalk", file: "enemyWalk", frameW: 100, frameH: 200, fps: 10, y: 200, looping: true, playbackDirection: -1 },
+    { name: "enemyAttack", file: "enemyAttackDie", frameW: 100, frameH: 200, fps: 10, y: 0, looping: true, playbackDirection: -1 },
+    { name: "enemyDeath", file: "enemyAttackDie", frameW: 100, frameH: 200, fps: 10, y: 200, looping: false, playbackDirection: -1 }
 ];
 
 //
@@ -52,7 +52,7 @@ function loadAnimation(data) {
 
 function getAnimation(animationName) {
     let a = animations[animationName];
-    return new Animation(a.spriteSheet, a.frameWidth, a.frameHeight, a.fps, a.frameY);
+    return new Animation(a.spriteSheet, a.frameWidth, a.frameHeight, a.fps, a.frameY, a.looping, a.playbackDirection);
 }
 
 // Decrement imagesLoading and fire assetsLoaded event if all the images loaded
@@ -66,7 +66,7 @@ function imageOnLoad() {
 
 // Create a new animation, then call imageOnLoad
 function animationOnLoad(data, img) {
-    animations[data.name] = new Animation(img, data.frameW, data.frameH, data.fps, data.y);
+    animations[data.name] = new Animation(img, data.frameW, data.frameH, data.fps, data.y, data.looping, data.playbackDirection);
     imageOnLoad();
 }
 

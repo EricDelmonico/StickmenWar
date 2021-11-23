@@ -21,12 +21,13 @@ export class Scene {
         this.cameraMoveSpeed = 500;
 
         this.friendlyEntities = [];
-        this.friendlyEntities.push(new Unit(assets.getAnimation("friendlyWalk"), null, assets.getAnimation("friendlyAttack"), new Rect(0, worldHeight - 110, 50, 100), 1, this.friendlyEntities));
+        this.friendlyEntities.push();
+        this.addUnit(this.friendlyEntities, "friendlyWalk", "friendlyDeath", "friendlyAttack", 0, worldHeight - 110, 50, 100, 1);
         
         this.enemyEntities = [];
-        this.enemyEntities.push(new Unit(assets.getAnimation("enemyWalk"), null, assets.getAnimation("enemyAttack"), new Rect(this.worldWidth - 75, worldHeight - 110, 50, 100), -1, this.enemyEntities));
+        this.addUnit(this.enemyEntities, "enemyWalk", "enemyDeath", "enemyAttack", this.worldWidth - 75, worldHeight - 110, 50, 100, -1);
     }
-
+    
     update(dt) {
         this.userInput(dt);
         this.cameraClamp();
@@ -38,6 +39,10 @@ export class Scene {
         // Offset drawing by the camera position
         ctx.translate(-this.cameraPos, 0);
         this.drawEntities(ctx, dt);
+    }
+
+    addUnit(unitList, walkAnim, deathAnim, atkAnim, x, y, w, h, dir) {
+        unitList.push(new Unit(assets.getAnimation(walkAnim), assets.getAnimation(deathAnim), assets.getAnimation(atkAnim), new Rect(x, y, w, h), dir, unitList));
     }
 
     // Test collisions between the enemy and friendly units
