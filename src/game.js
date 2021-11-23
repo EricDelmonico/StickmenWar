@@ -37,13 +37,9 @@ function init() {
 
     // Once the assets are loaded, create scene and kick off the game loop
     document.addEventListener("assetsLoaded", () => {
-        createGameScene();
+        gameScene = new Scene(canvas.width, canvas.height);
         gameLoop();
     });
-}
-
-function createGameScene() {
-    gameScene = new Scene(canvas.width);
 }
 
 // Gameloop will probably never need to be touched.

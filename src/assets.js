@@ -17,7 +17,11 @@ let spriteNames = [
 // Animations! Format is anim name, file name, frame width, frame height, fps, frame y
 let animationDatas = [
     { name: "friendlyWalk", file: "friendlyWalk", frameW: 100, frameH: 200, fps: 10, y: 200 },
-    { name: "enemyWalk", file: "enemyWalk", frameW: 100, frameH: 200, fps: 10, y: 400 }
+    { name: "friendlyAttack", file: "friendlyAttackDie", frameW: 100, frameH: 200, fps: 10, y: 0 },
+    { name: "friendlyDie", file: "friendlyAttackDie", frameW: 100, frameH: 200, fps: 10, y: 200 },
+    { name: "enemyWalk", file: "enemyWalk", frameW: 100, frameH: 200, fps: 10, y: 400 },
+    { name: "enemyAttack", file: "enemyAttackDie", frameW: 100, frameH: 200, fps: 10, y: 0 },
+    { name: "enemyDie", file: "enemyAttackDie", frameW: 100, frameH: 200, fps: 10, y: 200 }
 ];
 
 //
