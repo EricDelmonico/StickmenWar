@@ -57,8 +57,13 @@ let spriteNames = [
 
 // Animations! Format is anim name, file name, frame width, frame height, fps, frame y
 let animationDatas = [
-    { name: "friendlyWalk", file: "characterWalk", frameW: 100, frameH: 200, fps: 10, y: 200 }
+    { name: "friendlyWalk", file: "friendlyWalk", frameW: 100, frameH: 200, fps: 10, y: 200 },
+    { name: "enemyWalk", file: "enemyWalk", frameW: 100, frameH: 200, fps: 10, y: 400 }
 ];
+
+//
+// Helper functions for loading and getting animations
+//
 
 function loadAll() {
     for (let name of spriteNames) {

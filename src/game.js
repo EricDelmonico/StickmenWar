@@ -3,7 +3,7 @@
 // game.js contains the main gameloop for the game.
 
 import { Rect } from "./drawing.js";
-import { Entity, Unit } from "./entities.js";
+import { Unit } from "./entities.js";
 
 // Asset imports
 import * as assets from "./assets.js";
@@ -14,7 +14,7 @@ import { Keys } from "./input.js";
 
 let ctx;
 let canvas;
-
+let clearColor = "#EEE";
 
 // Pixel width of the world
 let worldWidth = 1200;
@@ -72,14 +72,16 @@ function init() {
     // init all the entities in the game:
     entities = [
         new Unit(assets.getAnimation("friendlyWalk"), new Rect(0, 0, 75, 150)),
-        new Unit(assets.getAnimation("friendlyWalk"), new Rect(worldWidth - 75, 0, 75, 150)),
+        new Unit(assets.getAnimation("enemyWalk"), new Rect(worldWidth - 75, 0, 75, 150)),
     ];
 
     gameLoop();
 }
 
 // Gameloop will probably never need to be touched.
-// It should always do just these things
+// It should always do just these things.
+// It takes care of calculating dt, and
+// running the update and draw loops.
 let prevFrameTimeStamp;
 
 function gameLoop(timestamp) {
@@ -92,7 +94,7 @@ function gameLoop(timestamp) {
     // Clear, then update, then draw (like a typical game engine)
     ctx.save();
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = "gray";
+    ctx.fillStyle = clearColor;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.restore();
 

@@ -6,22 +6,6 @@
 // pretty much everything that's drawn on screen.
 
 import * as drawing from "./drawing.js";
-import { Rect } from "./drawing.js";
-
-export class Entity {
-    constructor(rect) {
-        this.rect = rect;
-        this.color = "magenta";
-    }
-    
-    update(dt) {
-        // Do nothing for basic entities
-    }
-
-    draw(ctx, dt) {
-        drawing.drawRect(ctx, this.rect, this.color);
-    }
-}
 
 export class Unit {
     constructor(animation, rect) {
@@ -35,5 +19,16 @@ export class Unit {
 
     draw(ctx, dt) {
         this.animation.draw(ctx, dt, this.rect);
+    }
+
+    // Returns true if colliding with other entity, false if not
+    //
+    // For simplicity's sake, other must be an entity to the right of this entity
+    collidingWithObjectOnRight(other) {
+        let right = this.rect.x + this.rect.width;
+        let otherLeft = other.rect.x;
+
+        if (right >= otherLeft) return true;
+        return false;
     }
 }
