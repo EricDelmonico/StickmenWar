@@ -18,10 +18,6 @@ let clearColor = "#FFF";
 // Current scene
 let gameScene;
 
-//
-// BOILERPLATE METHODS BELOW
-//
-
 // Take care of initializing canvas and grabbing the context
 window.onload = init;
 

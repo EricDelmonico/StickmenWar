@@ -43,7 +43,7 @@ function loadAll() {
 let imagesLoading = animationDatas.length + spriteNames.length;
 function loadImage(imageFileName) {
     let img = new Image();
-    img.src = `../assets/${imageFileName}.png`;
+    img.src = `./assets/${imageFileName}.png`;
     img.onload = imageOnLoad;
     return img;
 }

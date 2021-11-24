@@ -22,8 +22,8 @@ export class Base {
         
         this.hp = hp;
         this.maxHP = hp;
-        this.maxHPRect = new Rect(0, this.rect.y - 30, this.maxHP * 1.5, 25);
-        this.hpRect = new Rect(0, this.rect.y - 30, this.maxHP * 1.5, 25);
+        this.maxHPRect = new Rect(0, this.rect.y - 30, this.maxHP * 2.5, 25);
+        this.hpRect = new Rect(0, this.rect.y - 30, this.maxHP * 2.5, 25);
         this.maxHPRect.x = (this.rect.x + this.rect.width / 2) - (this.maxHPRect.width / 2);
         this.hpRect.x = (this.rect.x + this.rect.width / 2) - (this.maxHPRect.width / 2);
 
@@ -32,7 +32,6 @@ export class Base {
 
     update(dt) {
         this.hpRect.width = this.hp / this.maxHP * this.maxHPRect.width;
-        // TODO: Check if dead   
     }
 
     draw (ctx, dt) {

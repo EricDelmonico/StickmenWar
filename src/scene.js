@@ -18,25 +18,30 @@ export class Scene {
         // Pixel position of the camera in the world
         this.cameraPos = 0;
         // Movement speed of the camera in pixels per second
-        this.cameraMoveSpeed = 500;
+        this.cameraMoveSpeed = 750;
+
+        this.friendlySpawn = { x: 0, y: worldHeight - 110 };
+        this.enemySpawn = { x: this.worldWidth - 75, y: worldHeight - 110 };
+        this.unitDimensions = { w: 50, h: 100 };
 
         this.friendlyEntities = [];
         this.friendlyEntities.push();
-        this.addUnit(this.friendlyEntities, "friendlyWalk", "friendlyIdle", "friendlyDeath", "friendlyAttack", 0, worldHeight - 110, 50, 100, 1);
-        this.addUnit(this.friendlyEntities, "friendlyWalk", "friendlyIdle", "friendlyDeath", "friendlyAttack", 0, worldHeight - 110, 50, 100, 1);
-        this.addUnit(this.friendlyEntities, "friendlyWalk", "friendlyIdle", "friendlyDeath", "friendlyAttack", 0, worldHeight - 110, 50, 100, 1);
-        this.addUnit(this.friendlyEntities, "friendlyWalk", "friendlyIdle", "friendlyDeath", "friendlyAttack", 0, worldHeight - 110, 50, 100, 1);
-        
+        document.querySelector("#spawnTroops").onclick = () => this.spawnUnit(["friendlyWalk", "friendlyIdle", "friendlyDeath", "friendlyAttack", 1], true);
+
         this.enemyEntities = [];
-        this.addUnit(this.enemyEntities, "enemyWalk", "enemyIdle", "enemyDeath", "enemyAttack", this.worldWidth - 75, worldHeight - 110, 50, 100, -1);
-        this.addUnit(this.enemyEntities, "enemyWalk", "enemyIdle", "enemyDeath", "enemyAttack", this.worldWidth - 75, worldHeight - 110, 50, 100, -1);
+        this.spawnUnit(["enemyWalk", "enemyIdle", "enemyDeath", "enemyAttack", -1]);
+        this.spawnUnit(["enemyWalk", "enemyIdle", "enemyDeath", "enemyAttack", -1]);
+        this.spawnUnit(["enemyWalk", "enemyIdle", "enemyDeath", "enemyAttack", -1]);
+        this.spawnUnit(["enemyWalk", "enemyIdle", "enemyDeath", "enemyAttack", -1]);
+        this.spawnUnit(["enemyWalk", "enemyIdle", "enemyDeath", "enemyAttack", -1]);
+        this.spawnUnit(["enemyWalk", "enemyIdle", "enemyDeath", "enemyAttack", -1]);
 
         this.gameOver = false;
         let onBaseDestroy = () => this.gameOver = true;
-        this.friendlyBase = new Base(assets.sprites["friendlyBase"], new Rect(0, worldHeight - 200, 200, 200), 100, onBaseDestroy);
-        this.enemyBase = new Base(assets.sprites["enemyBase"], new Rect(this.worldWidth - 200, worldHeight - 200, 200, 200), 100, onBaseDestroy);
+        this.friendlyBase = new Base(assets.sprites["friendlyBase"], new Rect(0, worldHeight - 200, 200, 200), 75, onBaseDestroy);
+        this.enemyBase = new Base(assets.sprites["enemyBase"], new Rect(this.worldWidth - 200, worldHeight - 200, 200, 200), 75, onBaseDestroy);
     }
-    
+
     update(dt) {
         this.userInput(dt);
         this.cameraClamp();
@@ -55,24 +60,20 @@ export class Scene {
         this.drawEntities(ctx, dt);
     }
 
+    // unit data should be walk animation, idle animation, death animation, attack animation, direction
+    spawnUnit(unitData, friendly = false) {
+        let list = friendly ? this.friendlyEntities : this.enemyEntities;
+        let x = friendly ? this.friendlySpawn.x : this.enemySpawn.x;
+        let y = friendly ? this.friendlySpawn.y : this.enemySpawn.y;
+        this.addUnit(list, unitData[0], unitData[1], unitData[2], unitData[3], x, y, this.unitDimensions.w, this.unitDimensions.h, unitData[4]);
+    }
+
     addUnit(unitList, walkAnim, idleAnim, deathAnim, atkAnim, x, y, w, h, dir) {
-        unitList.push(new Unit(assets.getAnimation(walkAnim), assets.getAnimation(idleAnim), assets.getAnimation(deathAnim), assets.getAnimation(atkAnim), new Rect(x, y, w, h), dir, unitList));
+        if (!this.gameOver) unitList.push(new Unit(assets.getAnimation(walkAnim), assets.getAnimation(idleAnim), assets.getAnimation(deathAnim), assets.getAnimation(atkAnim), new Rect(x, y, w, h), dir, unitList));
     }
 
     // Test collisions between units
     collideUnits(dt) {
-        // friendly-enemy collisions
-        for (let f of this.friendlyEntities) {
-            for (let e of this.enemyEntities) {
-                if (e.rect.collidesWith(f.rect)) {
-                    f.state = UnitStates.Attacking;
-                    e.state = UnitStates.Attacking;
-                    e.doDamage(f.damage * dt);
-                    f.doDamage(e.damage * dt);
-                }
-            }
-        }
-
         // friendly-friendly collisions
         // They should only be able to be blocked by the friendly in front of them
         for (let i = 1; i < this.friendlyEntities.length; i++) {
@@ -83,7 +84,7 @@ export class Scene {
                 this.friendlyEntities[i].state = UnitStates.Walking;
             }
         }
-        
+
         // Enemy-enemy collisions
         // They should only be able to be blocked by the enemy in front of them
         for (let i = 1; i < this.enemyEntities.length; i++) {
@@ -94,14 +95,26 @@ export class Scene {
                 this.enemyEntities[i].state = UnitStates.Walking;
             }
         }
-        
+
         // If the game is over, trot the winners past the opposing base, and ignore base collisions
-        if (this.gameOver) { 
+        if (this.gameOver) {
             if (this.friendlyEntities.length > 0) this.friendlyEntities[0].state = UnitStates.Walking;
             if (this.enemyEntities.length > 0) this.enemyEntities[0].state = UnitStates.Walking;
             return;
         }
-        
+
+        // friendly-enemy collision--only the front ones can collide
+        let frontEnemy = this.enemyEntities[0];
+        let frontFriendly = this.friendlyEntities[0];
+        if (frontEnemy && frontFriendly && frontEnemy.rect.collidesWith(frontFriendly.rect)) {
+            frontFriendly.state = UnitStates.Attacking;
+            frontEnemy.state = UnitStates.Attacking;
+            frontEnemy.doDamage(frontFriendly.damage * dt);
+            frontFriendly.doDamage(frontEnemy.damage * dt);
+            // if attacking units, don't attack base also
+            return;
+        }
+
         // Friendly-enemy base collision
         if (this.friendlyEntities.length > 0 && this.friendlyEntities[0].rect.collidesWith(this.enemyBase.rect)) {
             this.friendlyEntities[0].state = UnitStates.Attacking;
