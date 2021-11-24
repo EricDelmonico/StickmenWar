@@ -11,12 +11,49 @@ import { Rect } from "./rect.js";
 export const UnitStates = {
     Walking: 0,
     Stopped: 1,
-    Dead: 2
+    Attacking: 2,
+    Dead: 3
 };
 
+export class Base {
+    constructor(sprite, rect, hp = 100, onDestroy = () => { console.log("Destroyed") }) {
+        this.sprite = sprite;
+        this.rect = rect;
+        
+        this.hp = hp;
+        this.maxHP = hp;
+        this.maxHPRect = new Rect(0, this.rect.y - 30, this.maxHP * 1.5, 25);
+        this.hpRect = new Rect(0, this.rect.y - 30, this.maxHP * 1.5, 25);
+        this.maxHPRect.x = (this.rect.x + this.rect.width / 2) - (this.maxHPRect.width / 2);
+        this.hpRect.x = (this.rect.x + this.rect.width / 2) - (this.maxHPRect.width / 2);
+
+        this.onDestroy = onDestroy;
+    }
+
+    update(dt) {
+        this.hpRect.width = this.hp / this.maxHP * this.maxHPRect.width;
+        // TODO: Check if dead   
+    }
+
+    draw (ctx, dt) {
+        drawing.drawSprite(ctx, this.sprite, this.rect);
+        // Draw health bar
+        drawing.drawRect(ctx, this.maxHPRect, "red");
+        drawing.drawRect(ctx, this.hpRect, "green");
+    }
+
+    doDamage(damage) {
+        this.hp -= damage;
+        if (this.hp <= 0) {
+            this.onDestroy();
+        }
+    }
+}
+
 export class Unit {
-    constructor(walkAnimation, deathAnimation, attackAnimation, rect, dir, entityList, damage = 1, hp = 10) {
+    constructor(walkAnimation, idleAnimation, deathAnimation, attackAnimation, rect, dir, entityList, damage = 2, hp = 10) {
         this.walkAnim = walkAnimation;
+        this.idleAnim = idleAnimation;
         this.deathAnim = deathAnimation;
         this.attackAnim = attackAnimation;
         this.animation = walkAnimation;
@@ -27,8 +64,8 @@ export class Unit {
         this.damage = damage;
         this.hp = hp;
         this.maxHP = hp;
-        this.maxHPRect = new Rect(0, this.rect.y - 10, this.maxHP * 5, 10);
-        this.hpRect = new Rect(0, this.rect.y - 10, this.maxHP * 5, 10);
+        this.maxHPRect = new Rect(0, this.rect.y - 10, this.maxHP * 4, 10);
+        this.hpRect = new Rect(0, this.rect.y - 10, this.maxHP * 4, 10);
         this.entityList = entityList;
     }
 
@@ -48,8 +85,11 @@ export class Unit {
                 this.animation = this.walkAnim;
                 this.rect.x += this.dir * this.speed * dt;
                 break;
-            case UnitStates.Stopped:
+            case UnitStates.Attacking:
                 this.animation = this.attackAnim;
+                break;
+            case UnitStates.Stopped:
+                this.animation = this.idleAnim;
                 break;
             case UnitStates.Dead:
                 this.animation = this.deathAnim;
@@ -79,5 +119,8 @@ export class Unit {
     deathAnimationOver() {
         let index = this.entityList.indexOf(this);
         this.entityList.splice(index, 1);
+
+        // Make sure the entity behind this one kicks it into gear :)
+        if (this.entityList.length > 0) this.entityList[0].state = UnitStates.Walking;
     }
 }

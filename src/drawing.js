@@ -4,6 +4,8 @@
 // It has methods to draw rects, sprites, and sprites
 // from spritesheets.
 
+import { Rect } from "./rect.js";
+
 function drawRect(ctx, rect, color) {
     ctx.save();
     ctx.beginPath();
