@@ -40,15 +40,31 @@ export class Scene {
         let onBaseDestroy = () => this.gameOver = true;
         this.friendlyBase = new Base(assets.sprites["friendlyBase"], new Rect(0, worldHeight - 200, 200, 200), 75, onBaseDestroy);
         this.enemyBase = new Base(assets.sprites["enemyBase"], new Rect(this.worldWidth - 200, worldHeight - 200, 200, 200), 75, onBaseDestroy);
+
+        // Set up pause button
+        this.paused = true;
+        this.pauseButton = document.querySelector("#pause");
+        this.pauseButton.onclick = () => {
+            if (this.paused) {
+                this.paused = false;
+                this.pauseButton.textContent = "Pause";
+            } else {
+                this.paused = true;
+                this.pauseButton.textContent = "Play";
+            }
+        };
     }
 
     update(dt) {
         this.userInput(dt);
         this.cameraClamp();
-        this.collideUnits(dt);
-        this.updateEntities(dt);
-        this.enemyBase.update(dt);
-        this.friendlyBase.update(dt);
+
+        if (!this.paused) {
+            this.collideUnits(dt);
+            this.updateEntities(dt);
+            this.enemyBase.update(dt);
+            this.friendlyBase.update(dt);
+        }
     }
 
     draw(ctx, dt) {
@@ -79,8 +95,7 @@ export class Scene {
         for (let i = 1; i < this.friendlyEntities.length; i++) {
             if (this.friendlyEntities[i].rect.collidesWith(this.friendlyEntities[i - 1].rect)) {
                 this.friendlyEntities[i].state = UnitStates.Stopped;
-            }
-            else {
+            } else {
                 this.friendlyEntities[i].state = UnitStates.Walking;
             }
         }
@@ -90,8 +105,7 @@ export class Scene {
         for (let i = 1; i < this.enemyEntities.length; i++) {
             if (this.enemyEntities[i].rect.collidesWith(this.enemyEntities[i - 1].rect)) {
                 this.enemyEntities[i].state = UnitStates.Stopped;
-            }
-            else {
+            } else {
                 this.enemyEntities[i].state = UnitStates.Walking;
             }
         }

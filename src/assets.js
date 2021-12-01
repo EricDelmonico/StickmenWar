@@ -15,16 +15,16 @@ let spriteNames = [
     "enemyBase"
 ];
 
-// Animations! Format is anim name, file name, frame width, frame height, fps, frame y, looping
+// Animations! Format is anim name, file name, frame width, frame height, fps, frame y, looping, playbackDirection, frames
 let animationDatas = [
-    { name: "friendlyWalk", file: "friendlyWalk", frameW: 100, frameH: 200, fps: 10, y: 200, looping: true, playbackDirection: 1 },
-    { name: "friendlyIdle", file: "friendlyWalk", frameW: 100, frameH: 200, fps: 4, y: 0, looping: true, playbackDirection: 1 },
-    { name: "friendlyAttack", file: "friendlyAttackDie", frameW: 100, frameH: 200, fps: 10, y: 0, looping: true, playbackDirection: 1 },
-    { name: "friendlyDeath", file: "friendlyAttackDie", frameW: 100, frameH: 200, fps: 10, y: 200, looping: false, playbackDirection: 1 },
-    { name: "enemyWalk", file: "enemyWalk", frameW: 100, frameH: 200, fps: 10, y: 200, looping: true, playbackDirection: -1 },
-    { name: "enemyIdle", file: "enemyWalk", frameW: 100, frameH: 200, fps: 4, y: 0, looping: true, playbackDirection: -1 },
-    { name: "enemyAttack", file: "enemyAttackDie", frameW: 100, frameH: 200, fps: 10, y: 0, looping: true, playbackDirection: -1 },
-    { name: "enemyDeath", file: "enemyAttackDie", frameW: 100, frameH: 200, fps: 10, y: 200, looping: false, playbackDirection: -1 }
+    { name: "friendlyWalk", file: "friendlyWalk", frameW: 100, frameH: 200, fps: 10, y: 200, looping: true, playbackDirection: 1, frames: 8 },
+    { name: "friendlyIdle", file: "friendlyWalk", frameW: 100, frameH: 200, fps: 4, y: 0, looping: true, playbackDirection: 1, frames: 4 },
+    { name: "friendlyAttack", file: "friendlyAttackDie", frameW: 100, frameH: 200, fps: 10, y: 0, looping: true, playbackDirection: 1, frames: 4 },
+    { name: "friendlyDeath", file: "friendlyAttackDie", frameW: 100, frameH: 200, fps: 10, y: 200, looping: false, playbackDirection: 1, frames: 4 },
+    { name: "enemyWalk", file: "enemyWalk", frameW: 100, frameH: 200, fps: 10, y: 200, looping: true, playbackDirection: -1, frames: 8 },
+    { name: "enemyIdle", file: "enemyWalk", frameW: 100, frameH: 200, fps: 4, y: 0, looping: true, playbackDirection: -1, frames: 4 },
+    { name: "enemyAttack", file: "enemyAttackDie", frameW: 100, frameH: 200, fps: 10, y: 0, looping: true, playbackDirection: -1, frames: 4 },
+    { name: "enemyDeath", file: "enemyAttackDie", frameW: 100, frameH: 200, fps: 10, y: 200, looping: false, playbackDirection: -1, frames: 4 }
 ];
 
 //
@@ -41,6 +41,7 @@ function loadAll() {
 }
 
 let imagesLoading = animationDatas.length + spriteNames.length;
+
 function loadImage(imageFileName) {
     let img = new Image();
     img.src = `./assets/${imageFileName}.png`;
@@ -69,7 +70,7 @@ function imageOnLoad() {
 
 // Create a new animation, then call imageOnLoad
 function animationOnLoad(data, img) {
-    animations[data.name] = new Animation(img, data.frameW, data.frameH, data.fps, data.y, data.looping, data.playbackDirection);
+    animations[data.name] = new Animation(img, data.frameW, data.frameH, data.fps, data.y, data.looping, data.playbackDirection, data.frames);
     imageOnLoad();
 }
 
