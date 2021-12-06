@@ -19,12 +19,12 @@ let spriteNames = [
 let animationDatas = [
     { name: "friendlyWalk", file: "friendlyWalk", frameW: 100, frameH: 200, fps: 10, y: 200, looping: true, playbackDirection: 1, frames: 8 },
     { name: "friendlyIdle", file: "friendlyWalk", frameW: 100, frameH: 200, fps: 4, y: 0, looping: true, playbackDirection: 1, frames: 4 },
-    { name: "friendlyAttack", file: "friendlyAttackDie", frameW: 100, frameH: 200, fps: 10, y: 0, looping: true, playbackDirection: 1, frames: 4 },
-    { name: "friendlyDeath", file: "friendlyAttackDie", frameW: 100, frameH: 200, fps: 10, y: 200, looping: false, playbackDirection: 1, frames: 4 },
+    { name: "friendlyAttack", file: "friendlyAttackDie", frameW: 100, frameH: 200, fps: 10, y: 0, looping: true, playbackDirection: 1, frames: 8 },
+    { name: "friendlyDeath", file: "friendlyAttackDie", frameW: 100, frameH: 200, fps: 10, y: 200, looping: false, playbackDirection: 1, frames: 8 },
     { name: "enemyWalk", file: "enemyWalk", frameW: 100, frameH: 200, fps: 10, y: 200, looping: true, playbackDirection: -1, frames: 8 },
     { name: "enemyIdle", file: "enemyWalk", frameW: 100, frameH: 200, fps: 4, y: 0, looping: true, playbackDirection: -1, frames: 4 },
-    { name: "enemyAttack", file: "enemyAttackDie", frameW: 100, frameH: 200, fps: 10, y: 0, looping: true, playbackDirection: -1, frames: 4 },
-    { name: "enemyDeath", file: "enemyAttackDie", frameW: 100, frameH: 200, fps: 10, y: 200, looping: false, playbackDirection: -1, frames: 4 }
+    { name: "enemyAttack", file: "enemyAttackDie", frameW: 100, frameH: 200, fps: 10, y: 0, looping: true, playbackDirection: -1, frames: 8 },
+    { name: "enemyDeath", file: "enemyAttackDie", frameW: 100, frameH: 200, fps: 10, y: 200, looping: false, playbackDirection: -1, frames: 8 }
 ];
 
 //
@@ -56,7 +56,7 @@ function loadAnimation(data) {
 
 function getAnimation(animationName) {
     let a = animations[animationName];
-    return new Animation(a.spriteSheet, a.frameWidth, a.frameHeight, a.fps, a.frameY, a.looping, a.playbackDirection);
+    return new Animation(a.spriteSheet, a.frameWidth, a.frameHeight, a.fps, a.frameY, a.looping, a.playbackDirection, a.frames);
 }
 
 // Decrement imagesLoading and fire assetsLoaded event if all the images loaded
