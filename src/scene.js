@@ -8,6 +8,7 @@ import * as assets from "./assets.js";
 import { Rect } from "./rect.js";
 import * as input from "./input.js";
 import { Keys } from "./input.js";
+import { EnemyAI } from "./enemyAI.js";
 
 export class Scene {
     constructor(cameraWidth, worldHeight) {
@@ -26,15 +27,11 @@ export class Scene {
 
         this.friendlyEntities = [];
         this.friendlyEntities.push();
-        document.querySelector("#spawnTroops").onclick = () => this.spawnUnit(["friendlyWalk", "friendlyIdle", "friendlyDeath", "friendlyAttack", 1], true);
+        document.querySelector("#spawnTroops").onclick = () => this.spawnUnit(["friendlyWalk", "friendlyIdle", "friendlyDeath", "friendlyAttack", 1, 2, 10], true);
 
         this.enemyEntities = [];
-        this.spawnUnit(["enemyWalk", "enemyIdle", "enemyDeath", "enemyAttack", -1]);
-        this.spawnUnit(["enemyWalk", "enemyIdle", "enemyDeath", "enemyAttack", -1]);
-        this.spawnUnit(["enemyWalk", "enemyIdle", "enemyDeath", "enemyAttack", -1]);
-        this.spawnUnit(["enemyWalk", "enemyIdle", "enemyDeath", "enemyAttack", -1]);
-        this.spawnUnit(["enemyWalk", "enemyIdle", "enemyDeath", "enemyAttack", -1]);
-        this.spawnUnit(["enemyWalk", "enemyIdle", "enemyDeath", "enemyAttack", -1]);
+        const enemySpawnCallback = () => this.spawnUnit(["enemyWalk", "enemyIdle", "enemyDeath", "enemyAttack", -1, 1, 10]);
+        this.enemyAI = new EnemyAI(enemySpawnCallback);
 
         this.gameOver = false;
         let onBaseDestroy = () => this.gameOver = true;
@@ -60,6 +57,7 @@ export class Scene {
         this.cameraClamp();
 
         if (!this.paused) {
+            this.enemyAI.update(dt, this.enemyEntities.length);
             this.collideUnits(dt);
             this.updateEntities(dt);
             this.enemyBase.update(dt);
@@ -81,11 +79,22 @@ export class Scene {
         let list = friendly ? this.friendlyEntities : this.enemyEntities;
         let x = friendly ? this.friendlySpawn.x : this.enemySpawn.x;
         let y = friendly ? this.friendlySpawn.y : this.enemySpawn.y;
-        this.addUnit(list, unitData[0], unitData[1], unitData[2], unitData[3], x, y, this.unitDimensions.w, this.unitDimensions.h, unitData[4]);
+        this.addUnit(list, unitData[0], unitData[1], unitData[2], unitData[3], x, y, this.unitDimensions.w, this.unitDimensions.h, unitData[4], unitData[5], unitData[6]);
     }
 
-    addUnit(unitList, walkAnim, idleAnim, deathAnim, atkAnim, x, y, w, h, dir) {
-        if (!this.gameOver) unitList.push(new Unit(assets.getAnimation(walkAnim), assets.getAnimation(idleAnim), assets.getAnimation(deathAnim), assets.getAnimation(atkAnim), new Rect(x, y, w, h), dir, unitList));
+    addUnit(unitList, walkAnim, idleAnim, deathAnim, atkAnim, x, y, w, h, dir, damage, hp) {
+        if (!this.gameOver)
+            unitList.push(
+                new Unit(
+                    assets.getAnimation(walkAnim), 
+                    assets.getAnimation(idleAnim), 
+                    assets.getAnimation(deathAnim), 
+                    assets.getAnimation(atkAnim), 
+                    new Rect(x, y, w, h), 
+                    dir, 
+                    unitList,
+                    damage,
+                    hp));
     }
 
     // Test collisions between units
@@ -125,8 +134,20 @@ export class Scene {
             frontEnemy.state = UnitStates.Attacking;
             frontEnemy.doDamage(frontFriendly.damage * dt);
             frontFriendly.doDamage(frontEnemy.damage * dt);
-            // if attacking units, don't attack base also
             return;
+        }
+        // both exist but they're not colliding, so they need to walk forwards
+        else if (frontEnemy && frontFriendly && frontEnemy.state != UnitStates.Dead) {
+            frontEnemy.state = UnitStates.Walking;
+            frontFriendly.state = UnitStates.Walking;
+        }
+        // Front enemy exists but there's no friendly
+        else if (frontEnemy && !frontFriendly) {
+            frontEnemy.state = UnitStates.Walking;
+        }
+        // Front friendly exists but there's no enemy
+        else if (frontFriendly && !frontEnemy) {
+            frontFriendly.state = UnitStates.Walking;
         }
 
         // Friendly-enemy base collision
