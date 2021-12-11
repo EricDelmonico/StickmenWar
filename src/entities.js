@@ -19,11 +19,11 @@ export class Base {
     constructor(sprite, rect, hp = 100, onDestroy = () => { console.log("Destroyed") }) {
         this.sprite = sprite;
         this.rect = rect;
-        
+
         this.hp = hp;
         this.maxHP = hp;
-        this.maxHPRect = new Rect(0, this.rect.y - 30, this.maxHP * 2.5, 25);
-        this.hpRect = new Rect(0, this.rect.y - 30, this.maxHP * 2.5, 25);
+        this.maxHPRect = new Rect(0, this.rect.y - 30, 175, 25);
+        this.hpRect = new Rect(0, this.rect.y - 30, this.maxHPRect.width, 25);
         this.maxHPRect.x = (this.rect.x + this.rect.width / 2) - (this.maxHPRect.width / 2);
         this.hpRect.x = (this.rect.x + this.rect.width / 2) - (this.maxHPRect.width / 2);
 
@@ -31,10 +31,10 @@ export class Base {
     }
 
     update(dt) {
-        this.hpRect.width = this.hp / this.maxHP * this.maxHPRect.width;
+        this.hpRect.width = (this.hp / this.maxHP) * this.maxHPRect.width;
     }
 
-    draw (ctx, dt) {
+    draw(ctx, dt) {
         drawing.drawSprite(ctx, this.sprite, this.rect);
         // Draw health bar
         drawing.drawRect(ctx, this.maxHPRect, "red");
@@ -50,22 +50,25 @@ export class Base {
 }
 
 export class Unit {
-    constructor(walkAnimation, idleAnimation, deathAnimation, attackAnimation, rect, dir, entityList, damage = 2, hp = 10) {
+    constructor(walkAnimation, idleAnimation, deathAnimation, attackAnimation, rect, dir, entityList, damage = 2, hp = 10, enemy = false) {
         this.walkAnim = walkAnimation;
         this.idleAnim = idleAnimation;
         this.deathAnim = deathAnimation;
         this.attackAnim = attackAnimation;
         this.animation = walkAnimation;
         this.rect = rect;
-        this.state = UnitStates.Walking;
+        this.internalState = UnitStates.Walking;
         this.dir = dir;
         this.speed = 100;
         this.damage = damage;
         this.hp = hp;
         this.maxHP = hp;
-        this.maxHPRect = new Rect(0, this.rect.y - 10, this.maxHP * 4, 10);
-        this.hpRect = new Rect(0, this.rect.y - 10, this.maxHP * 4, 10);
+        // rect.width with 10 pixels padding seems reasonable for health bar size
+        this.maxHPRect = new Rect(0, this.rect.y - 10, rect.width - 10, 10);
+        this.hpRect = new Rect(0, this.rect.y - 10, rect.width - 10, 10);
         this.entityList = entityList;
+
+        this.enemy = enemy;
     }
 
     update(dt) {
@@ -79,7 +82,7 @@ export class Unit {
         // Update hp bar width
         this.hpRect.width = this.hp / this.maxHP * this.maxHPRect.width;
 
-        switch (this.state) {
+        switch (this.internalState) {
             case UnitStates.Walking:
                 this.animation = this.walkAnim;
                 this.rect.x += this.dir * this.speed * dt;
@@ -108,10 +111,19 @@ export class Unit {
     }
 
     doDamage(damage) {
+        // Don't do any damage if we're already dead
+        if (this.internalState == UnitStates.Dead) {
+            return;
+        }
+
         this.hp -= damage;
         if (this.hp <= 0) {
-            this.state = UnitStates.Dead;
-            this.rect.collision = false;
+            this.internalState = UnitStates.Dead;
+
+            if (this.enemy) {
+                let e = new Event("enemydied");
+                document.dispatchEvent(e);
+            }
         }
     }
 
@@ -121,5 +133,11 @@ export class Unit {
 
         // Make sure the entity behind this one kicks it into gear :)
         if (this.entityList.length > 0) this.entityList[0].state = UnitStates.Walking;
+    }
+
+    set state(newstate) {
+        if (this.internalState != UnitStates.Dead) {
+            this.internalState = newstate;
+        }
     }
 }

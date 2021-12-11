@@ -9,6 +9,7 @@ const Keys = {
 };
 
 let keys;
+
 function init() {
     document.onkeydown = keyDown;
     document.onkeyup = keyUp;
@@ -32,4 +33,13 @@ function getKeyDown(keyCode) {
     return keys[keyCode];
 }
 
-export { init, getKeyDown, Keys }
+// Adapted from https://stackoverflow.com/questions/17130395/real-mouse-position-in-canvas
+function handleMousePos(e) {
+    var rect = document.querySelector("canvas").getBoundingClientRect();
+    return {
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top
+    };
+}
+
+export { init, getKeyDown, Keys, handleMousePos }

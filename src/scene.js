@@ -9,11 +9,14 @@ import { Rect } from "./rect.js";
 import * as input from "./input.js";
 import { Keys } from "./input.js";
 import { EnemyAI } from "./enemyAI.js";
+import { Arrow } from "./arrow.js";
 
 export class Scene {
     constructor(cameraWidth, worldHeight) {
         // Pixel width of the world
         this.worldWidth = 1200;
+        // Pixel height of the world
+        this.worldHeight = document.querySelector("canvas").height;
         // Pixel width of the camera
         this.cameraWidth = cameraWidth;
         // Pixel position of the camera in the world
@@ -25,12 +28,43 @@ export class Scene {
         this.enemySpawn = { x: this.worldWidth - 75, y: worldHeight - 110 };
         this.unitDimensions = { w: 50, h: 100 };
 
+        this.unitSpawner = document.querySelector("unit-spawner");
+
+        // Take care of player money
+        this.playerMoney = 50;
+        this.playerMoneyMarkup = document.querySelector("#playerMoney");
+        this.playerMoneyMarkup.textContent = "Your money: " + this.playerMoney;
+
         this.friendlyEntities = [];
-        this.friendlyEntities.push();
-        document.querySelector("#spawnTroops").onclick = () => this.spawnUnit(["friendlyWalk", "friendlyIdle", "friendlyDeath", "friendlyAttack", 1, 2, 10], true);
+        // Spawn troops when requested
+        document.addEventListener(
+            "trooprequested",
+            () => {
+                // Get attribute values
+                let dmg = this.unitSpawner.baseDamage;
+                let hp = this.unitSpawner.baseHP;
+                let cost = this.unitSpawner.baseCost;
+
+                if (cost <= this.playerMoney) {
+                    this.playerMoney -= cost;
+                    this.playerMoneyMarkup.textContent = "Your money: " + this.playerMoney;
+                    this.spawnUnit(["friendlyWalk", "friendlyIdle", "friendlyDeath", "friendlyAttack", 1, dmg, hp], true);
+                }
+            });
+
+        // When enemies die, gain money
+        document.addEventListener(
+            "enemydied",
+            () => {
+                console.log("enemy died");
+                this.playerMoney += 7;
+                this.playerMoneyMarkup.textContent = "Your money: " + this.playerMoney;
+            });
 
         this.enemyEntities = [];
-        const enemySpawnCallback = () => this.spawnUnit(["enemyWalk", "enemyIdle", "enemyDeath", "enemyAttack", -1, 1, 10]);
+        const enemySpawnCallback = () => this.spawnUnit(["enemyWalk", "enemyIdle", "enemyDeath", "enemyAttack", -1, 2, 10]);
+
+        // Enemy AI handles the spawning of enemy units
         this.enemyAI = new EnemyAI(enemySpawnCallback);
 
         this.gameOver = false;
@@ -50,6 +84,14 @@ export class Scene {
                 this.pauseButton.textContent = "Play";
             }
         };
+
+        // Shoot arrow on click
+        this.arrows = [];
+        document.querySelector("canvas").onclick = (e) => {
+            let mousePos = input.handleMousePos(e);
+            mousePos.x += this.cameraPos;
+            this.arrows.push(new Arrow(mousePos));
+        };
     }
 
     update(dt) {
@@ -62,6 +104,19 @@ export class Scene {
             this.updateEntities(dt);
             this.enemyBase.update(dt);
             this.friendlyBase.update(dt);
+
+            // Update arrows
+            for (let i = 0; i < this.arrows.length; i++) {
+                this.arrows[i].update(dt);
+
+                // If the arrow is off-screen, remove it.
+                if (this.arrows[i].rect.x > this.worldWidth ||
+                    this.arrows[i].rect.y > this.worldHeight ||
+                    this.arrows[i].rect.x < 0) {
+                    this.arrows.splice(i, 1);
+                    i--;
+                }
+            }
         }
     }
 
@@ -72,29 +127,31 @@ export class Scene {
         this.friendlyBase.draw(ctx, dt);
         this.enemyBase.draw(ctx, dt);
         this.drawEntities(ctx, dt);
+        this.arrows.forEach((arrow) => arrow.draw(ctx));
     }
 
-    // unit data should be walk animation, idle animation, death animation, attack animation, direction
+    // unit data should be walk animation, idle animation, death animation, attack animation, direction, damage, hp
     spawnUnit(unitData, friendly = false) {
         let list = friendly ? this.friendlyEntities : this.enemyEntities;
         let x = friendly ? this.friendlySpawn.x : this.enemySpawn.x;
         let y = friendly ? this.friendlySpawn.y : this.enemySpawn.y;
-        this.addUnit(list, unitData[0], unitData[1], unitData[2], unitData[3], x, y, this.unitDimensions.w, this.unitDimensions.h, unitData[4], unitData[5], unitData[6]);
+        this.addUnit(list, unitData[0], unitData[1], unitData[2], unitData[3], x, y, this.unitDimensions.w, this.unitDimensions.h, unitData[4], unitData[5], unitData[6], !friendly);
     }
 
-    addUnit(unitList, walkAnim, idleAnim, deathAnim, atkAnim, x, y, w, h, dir, damage, hp) {
+    addUnit(unitList, walkAnim, idleAnim, deathAnim, atkAnim, x, y, w, h, dir, damage, hp, enemy) {
         if (!this.gameOver)
             unitList.push(
                 new Unit(
-                    assets.getAnimation(walkAnim), 
-                    assets.getAnimation(idleAnim), 
-                    assets.getAnimation(deathAnim), 
-                    assets.getAnimation(atkAnim), 
-                    new Rect(x, y, w, h), 
-                    dir, 
+                    assets.getAnimation(walkAnim),
+                    assets.getAnimation(idleAnim),
+                    assets.getAnimation(deathAnim),
+                    assets.getAnimation(atkAnim),
+                    new Rect(x, y, w, h),
+                    dir,
                     unitList,
                     damage,
-                    hp));
+                    hp,
+                    enemy));
     }
 
     // Test collisions between units
@@ -124,6 +181,24 @@ export class Scene {
             if (this.friendlyEntities.length > 0) this.friendlyEntities[0].state = UnitStates.Walking;
             if (this.enemyEntities.length > 0) this.enemyEntities[0].state = UnitStates.Walking;
             return;
+        }
+
+        // enemy-projectile collisions
+        for (let i = 0; i < this.enemyEntities.length; i++) {
+            for (let j = 0; j < this.arrows.length; j++) {
+                // Make sure the arrow is at the appropriate height
+                if (this.arrows[j].rect.y > this.worldHeight - this.enemyEntities[i].rect.height - this.arrows[j].rect.height / 2) {
+                    // Check actual collision and do damage if colliding
+                    if (this.arrows[j].rect.collidesWith(this.enemyEntities[i].rect)) {
+                        // Do damage to the enemy
+                        this.enemyEntities[i].doDamage(this.arrows[j].damage);
+
+                        // remove the arrow
+                        this.arrows.splice(j, 1);
+                        j--;
+                    }
+                }
+            }
         }
 
         // friendly-enemy collision--only the front ones can collide

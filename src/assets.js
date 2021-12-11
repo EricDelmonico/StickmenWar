@@ -12,7 +12,8 @@ const animations = {};
 
 let spriteNames = [
     "friendlyBase",
-    "enemyBase"
+    "enemyBase",
+    "arrow"
 ];
 
 // Animations! Format is anim name, file name, frame width, frame height, fps, frame y, looping, playbackDirection, frames
