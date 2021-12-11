@@ -29,7 +29,8 @@ export class EnemyAI {
         }
         // Wave is now spawning
         else if (!this.waitForNewWave && this.currentSeconds > this.spawnInterval && this.enemiesSpawnedForWave < this.enemiesPerWave) {
-            this.spawnCallback();
+            let ranged = Math.random() > 0.5;
+            this.spawnCallback(ranged);
             this.currentSeconds = 0;
             this.enemiesSpawnedForWave++;
         }

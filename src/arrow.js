@@ -8,9 +8,9 @@ import * as assets from "./assets.js";
 import { drawSprite } from "./drawing.js";
 
 export class Arrow {
-    constructor(target) {
-        this.rect = new Rect(10, 0, 50, 50);
-        this.sprite = assets.sprites["arrow"];
+    constructor(target, sprite = "energyBall", startPosition = { x: 10, y: 0 }) {
+        this.rect = new Rect(startPosition.x, startPosition.y, 40, 40);
+        this.sprite = assets.sprites[sprite];
 
         // Figure out where the arrow is heading
         this.direction = { x: target.x - this.rect.x, y: target.y - this.rect.y };

@@ -5,6 +5,7 @@
 // This includes UI elements, in-game characters,
 // pretty much everything that's drawn on screen.
 
+import { Arrow } from "./arrow.js";
 import * as drawing from "./drawing.js";
 import { Rect } from "./rect.js";
 
@@ -50,7 +51,7 @@ export class Base {
 }
 
 export class Unit {
-    constructor(walkAnimation, idleAnimation, deathAnimation, attackAnimation, rect, dir, entityList, damage = 2, hp = 10, enemy = false) {
+    constructor(walkAnimation, idleAnimation, deathAnimation, attackAnimation, rect, dir, entityList, arrowList, damage = 2, hp = 10, enemy = false, ranged = false) {
         this.walkAnim = walkAnimation;
         this.idleAnim = idleAnimation;
         this.deathAnim = deathAnimation;
@@ -67,8 +68,14 @@ export class Unit {
         this.maxHPRect = new Rect(0, this.rect.y - 10, rect.width - 10, 10);
         this.hpRect = new Rect(0, this.rect.y - 10, rect.width - 10, 10);
         this.entityList = entityList;
+        this.arrowList = arrowList;
 
         this.enemy = enemy;
+
+        // 1 shot per shootingTime seconds
+        this.shootingTime = 1.5;
+        this.currentShootTime = 0;
+        this.ranged = ranged;
     }
 
     update(dt) {
@@ -86,12 +93,14 @@ export class Unit {
             case UnitStates.Walking:
                 this.animation = this.walkAnim;
                 this.rect.x += this.dir * this.speed * dt;
+                this.doShooting(dt);
                 break;
             case UnitStates.Attacking:
                 this.animation = this.attackAnim;
                 break;
             case UnitStates.Stopped:
                 this.animation = this.idleAnim;
+                this.doShooting(dt);
                 break;
             case UnitStates.Dead:
                 this.animation = this.deathAnim;
@@ -99,6 +108,20 @@ export class Unit {
                     this.deathAnimationOver();
                 }
                 break;
+        }
+    }
+
+    // Shoot in idle and walking
+    doShooting(dt) {
+        if (!this.ranged) return;
+
+        this.currentShootTime += dt;
+        if (this.currentShootTime > this.shootingTime) {
+            this.currentShootTime = 0;
+            this.arrowList.push(
+                    new Arrow({ x: this.dir * 10000, y: this.rect.y + 45 }, // target, x is * 10000 so the target is off-screen in dir direction 
+                        this.enemy ? "enemyArrow" : "friendlyArrow", // sprite for the arrow
+                        { x: this.rect.x, y: this.rect.y + 45 })) // starting position
         }
     }
 

@@ -28,7 +28,8 @@ export class Scene {
         this.enemySpawn = { x: this.worldWidth - 75, y: worldHeight - 110 };
         this.unitDimensions = { w: 50, h: 100 };
 
-        this.unitSpawner = document.querySelector("unit-spawner");
+        this.unitSpawner = document.querySelector("#spawner");
+        this.rangedUnitSpawner = document.querySelector("#rangedSpawner");
 
         // Take care of player money
         this.playerMoney = 50;
@@ -36,21 +37,26 @@ export class Scene {
         this.playerMoneyMarkup.textContent = "Your money: " + this.playerMoney;
 
         this.friendlyEntities = [];
-        // Spawn troops when requested
-        document.addEventListener(
-            "trooprequested",
-            () => {
-                // Get attribute values
-                let dmg = this.unitSpawner.baseDamage;
-                let hp = this.unitSpawner.baseHP;
-                let cost = this.unitSpawner.baseCost;
+        const handleTroopRequest = (ranged) => {
+            // Get attribute values
+            let spawner = ranged ? this.rangedUnitSpawner : this.unitSpawner;
+            let dmg = spawner.baseDamage;
+            let hp = spawner.baseHP;
+            let cost = spawner.baseCost;
 
-                if (cost <= this.playerMoney) {
-                    this.playerMoney -= cost;
-                    this.playerMoneyMarkup.textContent = "Your money: " + this.playerMoney;
-                    this.spawnUnit(["friendlyWalk", "friendlyIdle", "friendlyDeath", "friendlyAttack", 1, dmg, hp], true);
+            if (cost <= this.playerMoney) {
+                this.playerMoney -= cost;
+                this.playerMoneyMarkup.textContent = "Your money: " + this.playerMoney;
+                if (ranged) {
+                    this.spawnUnit(["friendlyWalkRanged", "friendlyIdleRanged", "friendlyDeath", "friendlyAttack", 1, dmg, hp, true], true);
+                } else {
+                    this.spawnUnit(["friendlyWalk", "friendlyIdle", "friendlyDeath", "friendlyAttack", 1, dmg, hp, false], true);
                 }
-            });
+            }
+        };
+        // Spawn troops when requested
+        document.addEventListener("trooprequested", () => handleTroopRequest(false));
+        document.addEventListener("rangedtrooprequested", () => handleTroopRequest(true));
 
         // When enemies die, gain money
         document.addEventListener(
@@ -62,8 +68,13 @@ export class Scene {
             });
 
         this.enemyEntities = [];
-        const enemySpawnCallback = () => this.spawnUnit(["enemyWalk", "enemyIdle", "enemyDeath", "enemyAttack", -1, 2, 10]);
-
+        const enemySpawnCallback = (ranged = false) => {
+            if (ranged) {
+                this.spawnUnit(["enemyWalkRanged", "enemyIdleRanged", "enemyDeath", "enemyAttack", -1, 2, 10, true]);
+            } else {
+                this.spawnUnit(["enemyWalk", "enemyIdle", "enemyDeath", "enemyAttack", -1, 2, 10, false]);
+            }
+        };
         // Enemy AI handles the spawning of enemy units
         this.enemyAI = new EnemyAI(enemySpawnCallback);
 
@@ -92,6 +103,14 @@ export class Scene {
             mousePos.x += this.cameraPos;
             this.arrows.push(new Arrow(mousePos));
         };
+
+        // Friendlies can shoot arrows--need to separate from
+        // mouse click arrows because mouse click arrows will not
+        // damage the enemy base
+        this.friendlyArrows = [];
+
+        // Enemies may also shoot arrows
+        this.enemyArrows = [];
     }
 
     update(dt) {
@@ -106,16 +125,22 @@ export class Scene {
             this.friendlyBase.update(dt);
 
             // Update arrows
-            for (let i = 0; i < this.arrows.length; i++) {
-                this.arrows[i].update(dt);
+            this.updateArrowList(dt, this.arrows);
+            this.updateArrowList(dt, this.friendlyArrows);
+            this.updateArrowList(dt, this.enemyArrows);
+        }
+    }
 
-                // If the arrow is off-screen, remove it.
-                if (this.arrows[i].rect.x > this.worldWidth ||
-                    this.arrows[i].rect.y > this.worldHeight ||
-                    this.arrows[i].rect.x < 0) {
-                    this.arrows.splice(i, 1);
-                    i--;
-                }
+    updateArrowList(dt, arrowList) {
+        for (let i = 0; i < arrowList.length; i++) {
+            arrowList[i].update(dt);
+
+            // If the arrow is off-screen, remove it.
+            if (arrowList[i].rect.x > this.worldWidth ||
+                arrowList[i].rect.y > this.worldHeight ||
+                arrowList[i].rect.x < 0) {
+                arrowList.splice(i, 1);
+                i--;
             }
         }
     }
@@ -128,17 +153,19 @@ export class Scene {
         this.enemyBase.draw(ctx, dt);
         this.drawEntities(ctx, dt);
         this.arrows.forEach((arrow) => arrow.draw(ctx));
+        this.friendlyArrows.forEach((arrow) => arrow.draw(ctx));
+        this.enemyArrows.forEach((arrow) => arrow.draw(ctx));
     }
 
-    // unit data should be walk animation, idle animation, death animation, attack animation, direction, damage, hp
+    // unit data should be walk animation, idle animation, death animation, attack animation, direction, damage, hp, ranged?
     spawnUnit(unitData, friendly = false) {
         let list = friendly ? this.friendlyEntities : this.enemyEntities;
         let x = friendly ? this.friendlySpawn.x : this.enemySpawn.x;
         let y = friendly ? this.friendlySpawn.y : this.enemySpawn.y;
-        this.addUnit(list, unitData[0], unitData[1], unitData[2], unitData[3], x, y, this.unitDimensions.w, this.unitDimensions.h, unitData[4], unitData[5], unitData[6], !friendly);
+        this.addUnit(list, unitData[0], unitData[1], unitData[2], unitData[3], x, y, this.unitDimensions.w, this.unitDimensions.h, unitData[4], unitData[5], unitData[6], !friendly, unitData[7]);
     }
 
-    addUnit(unitList, walkAnim, idleAnim, deathAnim, atkAnim, x, y, w, h, dir, damage, hp, enemy) {
+    addUnit(unitList, walkAnim, idleAnim, deathAnim, atkAnim, x, y, w, h, dir, damage, hp, enemy, ranged) {
         if (!this.gameOver)
             unitList.push(
                 new Unit(
@@ -149,13 +176,28 @@ export class Scene {
                     new Rect(x, y, w, h),
                     dir,
                     unitList,
+                    enemy ? this.enemyArrows : this.arrows,
                     damage,
                     hp,
-                    enemy));
+                    enemy,
+                    ranged));
     }
 
     // Test collisions between units
     collideUnits(dt) {
+        // Enemy-projectile collisions
+        this.entityListProjectileListCollisions(this.enemyEntities, this.arrows);
+        this.entityListProjectileListCollisions(this.enemyEntities, this.friendlyArrows);
+
+        // Friendly-projectile collisions
+        this.entityListProjectileListCollisions(this.friendlyEntities, this.enemyArrows);
+
+        // Friendly base-projectile collisions
+        this.baseProjectileListCollisions(this.friendlyBase, this.enemyArrows);
+
+        // Enemy base-projectile collisions
+        this.baseProjectileListCollisions(this.enemyBase, this.friendlyArrows);
+
         // friendly-friendly collisions
         // They should only be able to be blocked by the friendly in front of them
         for (let i = 1; i < this.friendlyEntities.length; i++) {
@@ -181,24 +223,6 @@ export class Scene {
             if (this.friendlyEntities.length > 0) this.friendlyEntities[0].state = UnitStates.Walking;
             if (this.enemyEntities.length > 0) this.enemyEntities[0].state = UnitStates.Walking;
             return;
-        }
-
-        // enemy-projectile collisions
-        for (let i = 0; i < this.enemyEntities.length; i++) {
-            for (let j = 0; j < this.arrows.length; j++) {
-                // Make sure the arrow is at the appropriate height
-                if (this.arrows[j].rect.y > this.worldHeight - this.enemyEntities[i].rect.height - this.arrows[j].rect.height / 2) {
-                    // Check actual collision and do damage if colliding
-                    if (this.arrows[j].rect.collidesWith(this.enemyEntities[i].rect)) {
-                        // Do damage to the enemy
-                        this.enemyEntities[i].doDamage(this.arrows[j].damage);
-
-                        // remove the arrow
-                        this.arrows.splice(j, 1);
-                        j--;
-                    }
-                }
-            }
         }
 
         // friendly-enemy collision--only the front ones can collide
@@ -235,6 +259,40 @@ export class Scene {
         if (this.enemyEntities.length > 0 && this.enemyEntities[0].rect.collidesWith(this.friendlyBase.rect)) {
             this.enemyEntities[0].state = UnitStates.Attacking;
             this.friendlyBase.doDamage(this.enemyEntities[0].damage * dt);
+        }
+    }
+
+    entityListProjectileListCollisions(entityList, arrowsList) {
+        for (let i = 0; i < entityList.length; i++) {
+            for (let j = 0; j < arrowsList.length; j++) {
+                if (this.doProjectileEntityCollision(entityList[i], arrowsList[j])) {
+                    // remove the arrow
+                    arrowsList.splice(j, 1);
+                    j--;
+                }
+            }
+        }
+    }
+
+    baseProjectileListCollisions(base, arrowsList) {
+        for (let i = 0; i < arrowsList.length; i++) {
+            if (this.doProjectileEntityCollision(base, arrowsList[i])) {
+                // remove the arrow
+                arrowsList.splice(i, 1);
+                i--;
+            }
+        }
+    }
+
+    doProjectileEntityCollision(entity, arrow) {
+        // Make sure the arrow is at the appropriate height
+        if (arrow.rect.y > this.worldHeight - entity.rect.height - arrow.rect.height / 2) {
+            // Check actual collision and do damage if colliding
+            if (arrow.rect.collidesWith(entity.rect)) {
+                // Do damage to the enemy
+                entity.doDamage(arrow.damage);
+                return true;
+            }
         }
     }
 
