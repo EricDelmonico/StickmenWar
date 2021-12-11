@@ -176,7 +176,7 @@ export class Scene {
                     new Rect(x, y, w, h),
                     dir,
                     unitList,
-                    enemy ? this.enemyArrows : this.arrows,
+                    enemy ? this.enemyArrows : this.friendlyArrows,
                     damage,
                     hp,
                     enemy,
@@ -191,12 +191,6 @@ export class Scene {
 
         // Friendly-projectile collisions
         this.entityListProjectileListCollisions(this.friendlyEntities, this.enemyArrows);
-
-        // Friendly base-projectile collisions
-        this.baseProjectileListCollisions(this.friendlyBase, this.enemyArrows);
-
-        // Enemy base-projectile collisions
-        this.baseProjectileListCollisions(this.enemyBase, this.friendlyArrows);
 
         // friendly-friendly collisions
         // They should only be able to be blocked by the friendly in front of them
@@ -224,6 +218,12 @@ export class Scene {
             if (this.enemyEntities.length > 0) this.enemyEntities[0].state = UnitStates.Walking;
             return;
         }
+
+        // Friendly base-projectile collisions
+        this.baseProjectileListCollisions(this.friendlyBase, this.enemyArrows);
+
+        // Enemy base-projectile collisions
+        this.baseProjectileListCollisions(this.enemyBase, this.friendlyArrows);
 
         // friendly-enemy collision--only the front ones can collide
         let frontEnemy = this.enemyEntities[0];

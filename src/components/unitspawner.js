@@ -50,7 +50,7 @@ class UnitSpawner extends HTMLElement {
         this.dmgMarkup.textContent = "Damage: " + this.baseDamage;
         this.hpMarkup.textContent = "Health: " + this.baseHP;
         this.costMarkup.textContent = "Cost: " + this.baseCost;
-        this.rangedMarkup.textContent = "Ranged: " + (this.ranged ? "Yes." : "No.");
+        this.rangedMarkup.textContent = "Ranged: " + (this.ranged ? "Yes" : "No");
     }
 } // end class
 
