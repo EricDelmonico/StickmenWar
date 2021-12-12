@@ -11,10 +11,6 @@ import * as assets from "./assets.js";
 // Handles user input for this game.
 import * as input from "./input.js";
 
-// Import components
-import "./components/unitspawner.js";
-import "./components/navigationbar.js";
-
 let ctx;
 let canvas;
 let clearColor = "#FFF";

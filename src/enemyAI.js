@@ -37,6 +37,7 @@ export class EnemyAI {
         // Wave is over
         else if (!this.waitForNewWave && this.enemiesSpawnedForWave >= this.enemiesPerWave && liveEnemies == 0) {
             this.waitForNewWave = true;
+            this.enemiesPerWave++;
             this.currentSeconds = 0;
             this.enemiesSpawnedForWave = 0;
         }

@@ -5,21 +5,31 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home</title>
-    <script src="src/game.js" type="module"></script>
+    <script src="src/loader.js" type="module"></script>
     <link rel="stylesheet" href="styles/styles.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" integrity="sha512-iBBXm8fW90+nuLcSKlbmrPcLa0OT92xO1BIsZ+ywDWZCvqsWgccV3gFoRBv0z+8dLJgyAHIhR35VZc2oM/gI1w==" crossorigin="anonymous" referrerpolicy="no-referrer"
-    />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+        integrity="sha512-iBBXm8fW90+nuLcSKlbmrPcLa0OT92xO1BIsZ+ywDWZCvqsWgccV3gFoRBv0z+8dLJgyAHIhR35VZc2oM/gI1w=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
 </head>
 
 <body>
     <navigation-bar></navigation-bar>
-    <div class="section container" id="home-info">
-        <p class="title"><a href="./app.html" class="is-hoverable has-text-black">Play Stickman War!</a></p>
-        <p class="subtitle">Stickman War is my homage to the classic flash game Age of War. You control an army of stickmen, and your goal is to defeat the other stickman army's base. Use the left and right arrow keys to move the camera, and click to shoot energy balls at
-            enemies (these instructions are also on the app page).</p>
-        <img id="homeImage" src="./assets/homeImage.png"></img>
+    <div class="is-flex is-flex-direction-column">
+        <div class="section container" id="home-info">
+            <p class="title" id="gameTitle"><a href="./app.html" class="is-hoverable has-text-black">Play Stickman War!</a></p>
+            <p class="subtitle">Stickman War is my homage to the classic flash game Age of War. You control an army of
+                stickmen, and your goal is to defeat the other stickman army's base. Use the left and right arrow keys
+                to move the camera, and click to shoot energy balls at
+                enemies (these instructions are also on the app page).</p>
+            <img id="homeImage" src="./assets/homeImage.png" alt="screenshot of game">
+        </div>
     </div>
+
+    <stickman-war-footer></stickman-war-footer>
 </body>
 
 </html>

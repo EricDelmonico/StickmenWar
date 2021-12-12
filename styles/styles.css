@@ -9,10 +9,22 @@
 }
 
 #home-info {
-    text-align: center;
+    max-width: 600px;
 }
 
 #homeImage {
     border: 2px solid black;
     border-radius: 5px;
+}
+
+#gameTitle{
+    font-family: 'Bebas Neue', cursive;
+}
+
+/*From https://onaircode.com/howto-html-css-disable-text-selection/#:~:text=The%20basic%20approach%20to%20disable%20user%20select%20highlighting,enable%20or%20disable%20feature%20of%20text%20selection%20highlighting.*/
+canvas {
+    user-select: none; /* For Chrome and Opera */
+    -ms-user-select: none; /* For Internet Edge and Explorer*/
+    -webkit-user-select: none; /* For Safari */
+    -moz-user-select: none; /* For Firefox */
 }

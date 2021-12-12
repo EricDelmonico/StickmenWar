@@ -19,35 +19,39 @@ let spriteNames = [
 ];
 
 // Animations! Format is anim name, file name, frame width, frame height, fps, frame y, looping, playbackDirection, frames
-let animationDatas = [
-    { name: "friendlyWalk", file: "friendlyWalk", frameW: 100, frameH: 200, fps: 10, y: 200, looping: true, playbackDirection: 1, frames: 8 },
-    { name: "friendlyIdle", file: "friendlyWalk", frameW: 100, frameH: 200, fps: 4, y: 0, looping: true, playbackDirection: 1, frames: 4 },
-    { name: "friendlyWalkRanged", file: "friendlyWalkRanged", frameW: 100, frameH: 200, fps: 10, y: 200, looping: true, playbackDirection: 1, frames: 4 },
-    { name: "friendlyIdleRanged", file: "friendlyWalkRanged", frameW: 100, frameH: 200, fps: 4, y: 0, looping: true, playbackDirection: 1, frames: 4 },
-    { name: "friendlyAttack", file: "friendlyAttackDie", frameW: 100, frameH: 200, fps: 10, y: 0, looping: true, playbackDirection: 1, frames: 8 },
-    { name: "friendlyDeath", file: "friendlyAttackDie", frameW: 100, frameH: 200, fps: 10, y: 200, looping: false, playbackDirection: 1, frames: 8 },
-    { name: "enemyWalk", file: "enemyWalk", frameW: 100, frameH: 200, fps: 10, y: 200, looping: true, playbackDirection: -1, frames: 8 },
-    { name: "enemyIdle", file: "enemyWalk", frameW: 100, frameH: 200, fps: 4, y: 0, looping: true, playbackDirection: -1, frames: 4 },
-    { name: "enemyWalkRanged", file: "enemyWalkRanged", frameW: 100, frameH: 200, fps: 10, y: 200, looping: true, playbackDirection: -1, frames: 4 },
-    { name: "enemyIdleRanged", file: "enemyWalkRanged", frameW: 100, frameH: 200, fps: 4, y: 0, looping: true, playbackDirection: -1, frames: 4 },
-    { name: "enemyAttack", file: "enemyAttackDie", frameW: 100, frameH: 200, fps: 10, y: 0, looping: true, playbackDirection: -1, frames: 8 },
-    { name: "enemyDeath", file: "enemyAttackDie", frameW: 100, frameH: 200, fps: 10, y: 200, looping: false, playbackDirection: -1, frames: 8 }
-];
+let animationDatas;
 
 //
 // Helper functions for loading and getting animations
 //
 
+let imagesLoading = 0;
 function loadAll() {
-    for (let name of spriteNames) {
-        sprites[name] = loadImage(name);
-    }
-    for (let data of animationDatas) {
-        loadAnimation(data);
-    }
-}
+    const fetchPromise = async (file) => {
+        let response = await fetch(file);
 
-let imagesLoading = animationDatas.length + spriteNames.length;
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        let json = await response.json();
+        return json;
+    }
+
+    // Load animation data from json data file
+    fetchPromise("data/animations.json")
+        .then((animData) => {
+            animationDatas = animData;
+            imagesLoading = animationDatas.length + spriteNames.length;
+
+            for (let name of spriteNames) {
+                sprites[name] = loadImage(name);
+            }
+            for (let data of animationDatas) {
+                loadAnimation(data);
+            }
+        }).catch(e => console.log(`In catch with e=${e}`));
+}
 
 function loadImage(imageFileName) {
     let img = new Image();

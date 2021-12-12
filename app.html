@@ -5,26 +5,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>App</title>
+    <script src="src/loader.js" type="module"></script>
     <script src="src/game.js" type="module"></script>
     <link rel="stylesheet" href="styles/styles.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" integrity="sha512-iBBXm8fW90+nuLcSKlbmrPcLa0OT92xO1BIsZ+ywDWZCvqsWgccV3gFoRBv0z+8dLJgyAHIhR35VZc2oM/gI1w==" crossorigin="anonymous" referrerpolicy="no-referrer"
-    />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+        integrity="sha512-iBBXm8fW90+nuLcSKlbmrPcLa0OT92xO1BIsZ+ywDWZCvqsWgccV3gFoRBv0z+8dLJgyAHIhR35VZc2oM/gI1w=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 
 <body>
     <navigation-bar></navigation-bar>
-    <div class="section container">
-        <button id="pause" class="button my-3">Play</button>
-        <p class="subtitle" id="playerMoney">Your money: </p>
-        <p class="subtitle">Spawn troops:</p>
-        <div class="container is-flex is-flex-direction-row">
-            <unit-spawner id="spawner" data-ranged="0" data-hp="10" data-dmg="2" data-image="troopThumbnail" class="mr-3"></unit-spawner>
-            <unit-spawner id="rangedSpawner" data-ranged="1" data-hp="7" data-dmg="1" data-cost="10" data-image="troopThumbnailRanged"></unit-spawner>
+    <div class="is-flex is-flex-direction-column">
+        <div class="section container">
+            <button id="pause" class="button my-3 has-background-success">Play</button>
+            <p class="subtitle" id="playerMoney">Your money: </p>
+            <p class="subtitle mb-2">Spawn troops:</p>
+            <div class="container is-flex is-flex-direction-row">
+                <unit-spawner id="spawner" data-ranged="0" data-hp="10" data-dmg="2" data-image="troopThumbnail"
+                    class="mr-3"></unit-spawner>
+                <unit-spawner id="rangedSpawner" data-ranged="1" data-hp="7" data-dmg="1" data-cost="10"
+                    data-image="troopThumbnailRanged"></unit-spawner>
+            </div>
+            <canvas id="mycanvas" width="600" height="400" style="border: 1px solid black"></canvas>
+            <p>Left and right arrow keys to move the camera. Click to shoot energy balls at the enemies!</p>
         </div>
-        <canvas id="mycanvas" width="600" height="400" style="border: 1px solid black"></canvas>
-        <p>Left and right arrow keys to move the camera. Click to shoot energy balls at the enemies!</p>
     </div>
+
+    <stickman-war-footer></stickman-war-footer>
 </body>
 
 </html>
