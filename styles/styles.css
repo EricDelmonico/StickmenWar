@@ -1,0 +1,18 @@
+#spawnTroops {
+    height: 150px;
+    width: 100px;
+}
+
+#thumbnail {
+    max-width: 100%;
+    max-height: 100%;
+}
+
+#home-info {
+    text-align: center;
+}
+
+#homeImage {
+    border: 2px solid black;
+    border-radius: 5px;
+}

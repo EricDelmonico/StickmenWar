@@ -29,7 +29,7 @@ let animationDatas = [
     { name: "enemyWalk", file: "enemyWalk", frameW: 100, frameH: 200, fps: 10, y: 200, looping: true, playbackDirection: -1, frames: 8 },
     { name: "enemyIdle", file: "enemyWalk", frameW: 100, frameH: 200, fps: 4, y: 0, looping: true, playbackDirection: -1, frames: 4 },
     { name: "enemyWalkRanged", file: "enemyWalkRanged", frameW: 100, frameH: 200, fps: 10, y: 200, looping: true, playbackDirection: -1, frames: 4 },
-    { name: "enemyIdleRanged", file: "enemyWalkRanged", frameW: 100, frameH: 200, fps: 10, y: 0, looping: true, playbackDirection: -1, frames: 4 },
+    { name: "enemyIdleRanged", file: "enemyWalkRanged", frameW: 100, frameH: 200, fps: 4, y: 0, looping: true, playbackDirection: -1, frames: 4 },
     { name: "enemyAttack", file: "enemyAttackDie", frameW: 100, frameH: 200, fps: 10, y: 0, looping: true, playbackDirection: -1, frames: 8 },
     { name: "enemyDeath", file: "enemyAttackDie", frameW: 100, frameH: 200, fps: 10, y: 200, looping: false, playbackDirection: -1, frames: 8 }
 ];

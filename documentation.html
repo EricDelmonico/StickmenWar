@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentation</title>
+    <script src="src/game.js" type="module"></script>
+    <link rel="stylesheet" href="styles/styles.css" />
+    <link rel="stylesheet" href="styles/documentation.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" integrity="sha512-iBBXm8fW90+nuLcSKlbmrPcLa0OT92xO1BIsZ+ywDWZCvqsWgccV3gFoRBv0z+8dLJgyAHIhR35VZc2oM/gI1w==" crossorigin="anonymous" referrerpolicy="no-referrer"
+    />
+</head>
+
+<body>
+    <navigation-bar></navigation-bar>
+    <div class="section container">
+        <ol>
+            <li>PROJECT REQUIREMENTS:
+                <ul>
+                    <li><a href="https://github.com/tonethar/IGME-330-Fall-2021/blob/main/projects/project-1.md">https://github.com/tonethar/IGME-330-Fall-2021/blob/main/projects/project-1.md</a></li>
+                    <li><a href="https://github.com/tonethar/IGME-330-Fall-2021/blob/main/projects/project-2.md">https://github.com/tonethar/IGME-330-Fall-2021/blob/main/projects/project-2.md</a></li>
+                </ul>
+            </li>
+            <li>RESOURCES UTILIZED:
+
+            </li>
+            <li>JS Libraries:
+                <ul>
+                    <li><a href="https://canvasjs.com/">Canvas</a></li>
+                </ul>
+            </li>
+            <li>NOTEWORTHY:
+                <ul>
+                    <li>Code:
+                        <ul>
+                            <li>Made liberal use of helper functions and data files to reduce repeated code.</li>
+                            <li>Tried structuring my game as I would an actual game engine, with the game loop tracking deltaTime, and having an abstracted game loop that doesn't handle game logic.
+                            </li>
+                            <li>Attempted to give classes a singular purpose to keep a clean object oriented design, and succeeded generally (only class that got excessive was Scene in my opinion)</li>
+                            <li>Created clean systems for loading spritesheets into animations, and loading sprites, that allowed me to make additions easily and cleanly</li>
+                            <li>Folded my own simple input system that keeps track of input using events so that input checking will always be accurate, no matter the framerate</li>
+                        </ul>
+                    </li>
+                    <li>Gameplay/User Experience:
+                        <li>Balanced the game such that the player has to take an active role in the game (enemy deaths award less than enough for one troop, so the player has to shoot energy balls)</li>
+                        <li>Added different troop types that handle differently to add interest to gameplay</li>
+                        <li>Added animated assets to make the game feel more alive--troops are in motion whether taking action or just standing around</li>
+                        <li>Added sound effects also to make the game feel more alive</li>
+                    </li>
+                </ul>
+            </li>
+            <li>GRADING
+                <ul>
+                </ul>
+            </li>
+            <li>TO DO:
+                <ul>I would have liked to add some scenery to the background</ul>
+                <ul>It also would have been nice to have more units for the player to play with</ul>
+                <ul>In a perfect world, I also would have liked to playtest the game so the balance was better tuned</ul>
+            </li>
+        </ol>
+    </div>
+
+    <f2p-finder-footer></f2p-finder-footer>
+</body>
+
+</html>

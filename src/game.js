@@ -13,6 +13,7 @@ import * as input from "./input.js";
 
 // Import components
 import "./components/unitspawner.js";
+import "./components/navigationbar.js";
 
 let ctx;
 let canvas;

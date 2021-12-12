@@ -17,6 +17,7 @@ export class Scene {
         this.worldWidth = 1200;
         // Pixel height of the world
         this.worldHeight = document.querySelector("canvas").height;
+        this.screenWidth = document.querySelector("canvas").width;
         // Pixel width of the camera
         this.cameraWidth = cameraWidth;
         // Pixel position of the camera in the world
@@ -63,7 +64,7 @@ export class Scene {
             "enemydied",
             () => {
                 console.log("enemy died");
-                this.playerMoney += 7;
+                this.playerMoney += 9;
                 this.playerMoneyMarkup.textContent = "Your money: " + this.playerMoney;
             });
 
@@ -155,6 +156,30 @@ export class Scene {
         this.arrows.forEach((arrow) => arrow.draw(ctx));
         this.friendlyArrows.forEach((arrow) => arrow.draw(ctx));
         this.enemyArrows.forEach((arrow) => arrow.draw(ctx));
+
+        if (this.paused) {
+            this.drawCenteredText(ctx, "Paused");
+            // Pause text will take priority over game over text
+            return;
+        }
+
+        if (this.gameOver) {
+            // Draw an appropriate message to the screen based on the winner/loser
+            let text = "";
+            if (this.friendlyBase.hp <= 0) {
+                text = "You Lost!";
+            } else {
+                text = "You Won!";
+            }
+
+            this.drawCenteredText(ctx, text);
+        }
+    }
+
+    drawCenteredText(ctx, text) {
+        ctx.textAlign = "center";
+        ctx.font = "48px sans-serif";
+        ctx.fillText(text, this.screenWidth / 2 + this.cameraPos, this.worldHeight / 2, 200);
     }
 
     // unit data should be walk animation, idle animation, death animation, attack animation, direction, damage, hp, ranged?
@@ -214,8 +239,16 @@ export class Scene {
 
         // If the game is over, trot the winners past the opposing base, and ignore base collisions
         if (this.gameOver) {
-            if (this.friendlyEntities.length > 0) this.friendlyEntities[0].state = UnitStates.Walking;
-            if (this.enemyEntities.length > 0) this.enemyEntities[0].state = UnitStates.Walking;
+            if (this.friendlyEntities.length > 0 && this.enemyBase.hp <= 0) this.friendlyEntities[0].state = UnitStates.Walking;
+            if (this.enemyEntities.length > 0 && this.friendlyBase.hp <= 0) this.enemyEntities[0].state = UnitStates.Walking;
+
+            // Kill the units on the other team
+            if (this.friendlyBase.hp <= 0) {
+                this.killAll(this.friendlyEntities);
+            }
+            if (this.enemyBase.hp <= 0) {
+                this.killAll(this.enemyEntities);
+            }
             return;
         }
 
@@ -260,6 +293,13 @@ export class Scene {
             this.enemyEntities[0].state = UnitStates.Attacking;
             this.friendlyBase.doDamage(this.enemyEntities[0].damage * dt);
         }
+    }
+
+    killAll(entityList) {
+        entityList.forEach(e => {
+            e.state = UnitStates.Dead;
+            e.hp = 0;
+        });
     }
 
     entityListProjectileListCollisions(entityList, arrowsList) {

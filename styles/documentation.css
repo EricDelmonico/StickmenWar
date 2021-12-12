@@ -1,0 +1,19 @@
+ul {
+    list-style-type: disc;
+    margin-left: 2rem;
+    font-weight: initial;
+    font-size: 1rem;
+}
+
+ul ul {
+    list-style-type: circle;
+}
+
+ul ul ul {
+    list-style-type: square;
+}
+
+ol > li {
+    font-weight: bold;
+    font-size: 1.25rem;
+}

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>App</title>
     <script src="src/game.js" type="module"></script>
     <link rel="stylesheet" href="styles/styles.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
@@ -13,6 +13,7 @@
 </head>
 
 <body>
+    <navigation-bar></navigation-bar>
     <div class="section container">
         <button id="pause" class="button my-3">Play</button>
         <p class="subtitle" id="playerMoney">Your money: </p>
@@ -22,7 +23,7 @@
             <unit-spawner id="rangedSpawner" data-ranged="1" data-hp="7" data-dmg="1" data-cost="10" data-image="troopThumbnailRanged"></unit-spawner>
         </div>
         <canvas id="mycanvas" width="600" height="400" style="border: 1px solid black"></canvas>
-        <p>Left and right arrow keys to move the camera. Want to add more units and basic economy (as in player has money and uses it to buy troops).</p>
+        <p>Left and right arrow keys to move the camera. Click to shoot energy balls at the enemies!</p>
     </div>
 </body>
 

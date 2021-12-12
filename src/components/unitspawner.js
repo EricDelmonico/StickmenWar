@@ -5,8 +5,9 @@
 const template = document.createElement("template");
 template.innerHTML = `
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
+<link rel="stylesheet" href="./styles/styles.css">
 <div class="container is-flex is-justify-content-left mb-5">
-    <button id="spawnTroops" class="button" style="height: 150px; width: 100px;"><img id="thumbnail" style="max-width: 100%; max-height: 100%;"></button>
+    <button id="spawnTroops" class="button"><img id="thumbnail"></button>
     <div class="ml-3">
         <p id="dmg" class="has-text-danger">Damage: </p>
         <p id="hp" class="has-text-success">Health: </p>
